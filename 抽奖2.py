@@ -78,3 +78,14 @@ elif st.session_state.step == "lottery":
         
         # 抽完后弹出窗口
         show_results()
+
+import streamlit as st
+
+# 注入 PWA 的 manifest 链接和主题色
+st.markdown("""
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff4b4b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="抽奖助手">
+""", unsafe_allow_html=True)
