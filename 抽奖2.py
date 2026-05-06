@@ -7,63 +7,77 @@ import streamlit as st
 import random
 import time
 
-st.set_page_config(page_title="手机抽奖系统")
+# 设置页面配置
+st.set_page_config(page_title="手机抽奖系统", layout="centered")
 
-# 初始化状态
+# 初始化 Session State
 if 'step' not in st.session_state:
-    st.session_state.step = "input"  # 初始页面：输入
+    st.session_state.step = "input"
 if 'pool' not in st.session_state:
     st.session_state.pool = []
 if 'winners' not in st.session_state:
     st.session_state.winners = []
 
-# --- 弹窗逻辑 ---
-@st.dialog("🏆 本轮中奖名单")
+# --- 抽奖结果弹窗 ---
+@st.dialog("🎉 恭喜中奖人员")
 def show_results():
+    st.write("以下是本次中奖名单：")
     for name in st.session_state.winners:
-        st.success(f"🎉 {name}")
-    if st.button("返回首页"):
+        st.success(f"✨ {name}")
+    if st.button("关闭并重置"):
         st.session_state.step = "input"
         st.session_state.winners = []
         st.rerun()
 
-# --- 页面 1: 输入名单 ---
+# --- 逻辑页面跳转 ---
+
+# 页面 1: 输入名单
 if st.session_state.step == "input":
-    st.title("手机抽奖系统 - 第一步")
-    input_data = st.text_area("请输入名单 (一行一个)", height=300)
+    st.title("手机抽奖系统")
+    input_data = st.text_area("请输入名单 (一行一个)", height=300, placeholder="在此处粘贴名单...")
+    
     if st.button("加载名单"):
-        st.session_state.pool = [n.strip() for n in input_data.split('\n') if n.strip()]
-        if st.session_state.pool:
+        names = [n.strip() for n in input_data.split('\n') if n.strip()]
+        if names:
+            st.session_state.pool = names
             st.session_state.step = "lottery"
             st.rerun()
         else:
-            st.error("名单不能为空！")
+            st.error("名单不能为空，请输入后再尝试！")
 
-# --- 页面 2: 抽奖过程 ---
+# 页面 2: 抽奖现场
 elif st.session_state.step == "lottery":
-    st.title("手机抽奖系统 - 抽奖现场")
+    st.title("抽奖现场")
     st.write(f"当前池内总人数: **{len(st.session_state.pool)}**")
     
-    with st.expander("查看当前名单"):
-        st.write(st.session_state.pool)
+    # 优化后的名单查看方式
+    with st.expander("查看当前参与名单"):
+        display_list = "\n".join([f"• {name}" for name in st.session_state.pool])
+        st.markdown(display_list)
 
     num = st.number_input("设置抽取人数", min_value=1, max_value=len(st.session_state.pool), value=1)
     
     if st.button("开始抽取"):
-        st.session_state.winners = [] # 清空上一次结果
+        st.session_state.winners = []
         progress_bar = st.progress(0)
-        status_area = st.empty() # 用于展示当前中奖者的区域
+        status_area = st.empty()
         
         # 逐个抽取逻辑
         for i in range(num):
+            # 在抽取前先显示一个等待状态，增加仪式感
+            status_area.warning(f"正在准备抽取第 {i+1} 位...")
+            time.sleep(0.5) 
+            
             winner = random.choice(st.session_state.pool)
             st.session_state.pool.remove(winner)
             st.session_state.winners.append(winner)
             
-            # 视觉反馈：显示当前中奖者
-            status_area.info(f"正在抽取... 恭喜第 {i+1} 位中奖者: **{winner}**")
+            # 显示结果，持续 1 秒
+            status_area.success(f"🎉 恭喜第 {i+1} 位中奖者: **{winner}**")
             progress_bar.progress((i + 1) / num)
-            time.sleep(1) # 这里控制名单出来的间隔时间
+            
+            # 这里的 1.0 即为你要求的每人 1 秒的间隔
+            time.sleep(1.0) 
         
         # 抽完后弹出窗口
         show_results()
