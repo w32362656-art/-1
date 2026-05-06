@@ -1,0 +1,15 @@
+{
+  "name": "我的抽奖小程序",
+  "short_name": "抽奖助手",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff4b4b",
+  "icons": [
+    {
+      "src": "static/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
