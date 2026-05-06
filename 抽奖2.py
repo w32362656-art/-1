@@ -2,7 +2,6 @@
 # coding: utf-8
 
 # In[ ]:
-
 import streamlit as st
 import random
 import time
@@ -37,7 +36,6 @@ if st.session_state.step == "input":
     input_data = st.text_area("请输入名单 (一行一个)", height=300, placeholder="在此处粘贴名单...")
     
     if st.button("加载名单"):
-        # 去除空行并清理空格
         names = [n.strip() for n in input_data.split('\n') if n.strip()]
         if names:
             st.session_state.pool = names
@@ -66,4 +64,17 @@ elif st.session_state.step == "lottery":
         # 逐个抽取逻辑
         for i in range(num):
             status_area.warning(f"正在准备抽取第 {i+1} 位...")
-            time.sleep(0.5)
+            time.sleep(0.5) 
+            
+            winner = random.choice(st.session_state.pool)
+            st.session_state.pool.remove(winner)
+            st.session_state.winners.append(winner)           
+            # 显示结果，持续 1 秒
+            status_area.success(f"🎉 恭喜第 {i+1} 位中奖者: **{winner}**")
+            progress_bar.progress((i + 1) / num)
+            
+            # 这里的 1.0 即为你要求的每人 1 秒的间隔
+            time.sleep(1.0) 
+        
+        # 抽完后弹出窗口
+        show_results()
