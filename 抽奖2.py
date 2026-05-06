@@ -29,7 +29,7 @@ def show_results():
         st.session_state.winners = []
         st.rerun()
 
-# --- 逻辑页面跳转 ---
+# --- 逻辑页面 ---
 
 # 页面 1: 输入名单
 if st.session_state.step == "input":
@@ -37,6 +37,7 @@ if st.session_state.step == "input":
     input_data = st.text_area("请输入名单 (一行一个)", height=300, placeholder="在此处粘贴名单...")
     
     if st.button("加载名单"):
+        # 去除空行并清理空格
         names = [n.strip() for n in input_data.split('\n') if n.strip()]
         if names:
             st.session_state.pool = names
@@ -50,10 +51,10 @@ elif st.session_state.step == "lottery":
     st.title("抽奖现场")
     st.write(f"当前池内总人数: **{len(st.session_state.pool)}**")
     
-    # 优化后的名单查看方式
+    # 优化后的名单查看方式：使用 \n\n 强制每行显示一个名字
     with st.expander("查看当前参与名单"):
-        display_list = "\n".join([f"• {name}" for name in st.session_state.pool])
-        st.markdown(display_list)
+        formatted_names = "\n\n".join([f"• {name}" for name in st.session_state.pool])
+        st.markdown(formatted_names)
 
     num = st.number_input("设置抽取人数", min_value=1, max_value=len(st.session_state.pool), value=1)
     
@@ -64,20 +65,5 @@ elif st.session_state.step == "lottery":
         
         # 逐个抽取逻辑
         for i in range(num):
-            # 在抽取前先显示一个等待状态，增加仪式感
             status_area.warning(f"正在准备抽取第 {i+1} 位...")
-            time.sleep(0.5) 
-            
-            winner = random.choice(st.session_state.pool)
-            st.session_state.pool.remove(winner)
-            st.session_state.winners.append(winner)
-            
-            # 显示结果，持续 1 秒
-            status_area.success(f"🎉 恭喜第 {i+1} 位中奖者: **{winner}**")
-            progress_bar.progress((i + 1) / num)
-            
-            # 这里的 1.0 即为你要求的每人 1 秒的间隔
-            time.sleep(1.0) 
-        
-        # 抽完后弹出窗口
-        show_results()
+            time.sleep(0.5)
