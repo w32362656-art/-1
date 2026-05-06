@@ -92,7 +92,5 @@ st.markdown("""
 
 import streamlit as st
 
-# --- 你的主程序代码区 ---
-st.title("抽奖活动页面")
-# ... 这里是你的抽奖逻辑 ...
+
 
